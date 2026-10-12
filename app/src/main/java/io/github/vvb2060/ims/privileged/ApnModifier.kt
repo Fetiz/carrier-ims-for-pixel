@@ -18,6 +18,11 @@ class ApnModifier : Instrumentation() {
         private const val TAG = "ApnModifier"
         private val APN_URI: Uri = Telephony.Carriers.CONTENT_URI
         private const val PREFER_APN_URI_PREFIX = "content://telephony/carriers/preferapn/subId/"
+        private const val DEFAULT_APN_TYPE = "default,supl"
+
+        // 旧版本推荐 APN 带 ims 类型：系统因此不再自动添加 "ims" APN，IMS 走公网 APN 拿不到
+        // P-CSCF 而无法注册。重新写入时匹配这类记录并就地修正
+        private const val LEGACY_APN_TYPE = "default,supl,ims"
 
         const val BUNDLE_SELECT_SIM_ID = "select_sim_id"
         const val BUNDLE_NAME = "name"
@@ -70,7 +75,7 @@ class ApnModifier : Instrumentation() {
         val subId = arguments.getInt(BUNDLE_SELECT_SIM_ID, -1)
         val name = arguments.getString(BUNDLE_NAME).orEmpty().trim()
         val apn = arguments.getString(BUNDLE_APN).orEmpty().trim()
-        val type = arguments.getString(BUNDLE_TYPE).orEmpty().trim().ifBlank { "default,supl,ims" }
+        val type = arguments.getString(BUNDLE_TYPE).orEmpty().trim().ifBlank { DEFAULT_APN_TYPE }
         val mcc = arguments.getString(BUNDLE_MCC).orEmpty().filter { it.isDigit() }.take(3)
         val mnc = arguments.getString(BUNDLE_MNC).orEmpty().filter { it.isDigit() }.take(3)
         require(subId >= 0) { "invalid subId" }
@@ -133,10 +138,12 @@ class ApnModifier : Instrumentation() {
         apn: String,
         type: String,
     ): Long? {
-        val queries = listOf(
-            "numeric=? AND apn=? AND type=? AND sub_id=?" to arrayOf(numeric, apn, type, subId.toString()),
-            "numeric=? AND apn=? AND type=?" to arrayOf(numeric, apn, type),
-        )
+        val queries = listOf(type, LEGACY_APN_TYPE).distinct().flatMap { t ->
+            listOf(
+                "numeric=? AND apn=? AND type=? AND sub_id=?" to arrayOf(numeric, apn, t, subId.toString()),
+                "numeric=? AND apn=? AND type=?" to arrayOf(numeric, apn, t),
+            )
+        }
         for ((selection, args) in queries) {
             val existing = runCatching {
                 context.contentResolver.query(

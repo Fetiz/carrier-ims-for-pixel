@@ -397,8 +397,8 @@ class SupportRulesTest {
 
     @Test
     fun apnDraftMustHaveValidMccMncBeforeConfirmation() {
-        val valid = ApnDraftConfig("Carrier", "internet", "default,supl,ims", "460", "01")
-        val invalid = ApnDraftConfig("Carrier", "internet", "default,supl,ims", "460", "")
+        val valid = ApnDraftConfig("Carrier", "internet", "default,supl", "460", "01")
+        val invalid = ApnDraftConfig("Carrier", "internet", "default,supl", "460", "")
 
         assertNull(SupportRules.validateApnDraft(valid))
         assertNotNull(SupportRules.validateApnDraft(invalid))

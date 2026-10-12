@@ -810,7 +810,8 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         return ApnDraftConfig(
             name = name,
             apn = apn,
-            type = "default,supl,ims",
+            // 不带 ims：让系统自动使用运营商的 "ims" APN 注册 IMS
+            type = "default,supl",
             mcc = mcc,
             mnc = mnc,
         )
