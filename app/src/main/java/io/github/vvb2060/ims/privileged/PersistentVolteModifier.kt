@@ -115,7 +115,7 @@ class PersistentVolteModifier : Instrumentation() {
             result.putString(BUNDLE_RESULT_MSG, t.message ?: t.javaClass.simpleName)
         } finally {
             if (delegated) {
-                runCatching { am.stopDelegateShellPermissionIdentity() }
+                runCatching { am.stopShellPermissionDelegation() }
                     .onFailure { Log.w(TAG, "stop delegate shell identity failed", it) }
             }
         }
