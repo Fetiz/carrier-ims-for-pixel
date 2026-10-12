@@ -1,3 +1,14 @@
+## 3.9.0 Android 17 QPR1 修复 (2026-10-12)
+
+### 新增
+- 持久化 VoLTE（来自 PR #106）：写入 VoIMS opt-in 与 VoLTE 用户开关，重启后无需 Shizuku 即可 VoLTE 通话；5G SA 仍需重启后重新下发配置
+
+### 修复
+- 适配 Android 17 QPR1（CP3A）`stopDelegateShellPermissionIdentity(int)` 新签名，修复配置下发报 `No interface method stopDelegateShellPermissionIdentity` 导致 IMS 无法注册
+- 推荐 APN 不再带 `ims` 类型，避免 IMS 走公网 APN（如电信 ctnet）拿不到 P-CSCF 而无法注册；重新写入时会修正旧版本写入的记录
+
+---
+
 ## 3.9.0.r101 (2026-06-20)
 
 ### 优化
