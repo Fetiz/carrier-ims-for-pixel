@@ -281,8 +281,13 @@ class ImsModifier : Instrumentation() {
                 }
             }
         } finally {
-            am.stopDelegateShellPermissionIdentity()
-            Log.i(TAG, "stopped shell permission delegation")
+            // 停止失败不影响已写入的配置；instrumentation 结束时系统也会自动撤销委托
+            runCatching {
+                am.stopShellPermissionDelegation()
+                Log.i(TAG, "stopped shell permission delegation")
+            }.onFailure {
+                Log.w(TAG, "failed to stop shell permission delegation", it)
+            }
         }
     }
 

@@ -56,7 +56,7 @@ class SimReader : Instrumentation() {
         } finally {
             if (delegated) {
                 runCatching {
-                    am.stopDelegateShellPermissionIdentity()
+                    am.stopShellPermissionDelegation()
                     Log.i(TAG, "stopped shell permission delegation")
                 }.onFailure {
                     Log.w(TAG, "failed to stop shell permission delegation", it)

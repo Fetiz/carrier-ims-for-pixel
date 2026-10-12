@@ -13,6 +13,9 @@ public interface IActivityManager extends IInterface {
 
     void stopDelegateShellPermissionIdentity() throws RemoteException;
 
+    // Android 17 QPR1 (CP3A) 起改为带 uid 的签名
+    void stopDelegateShellPermissionIdentity(int uid) throws RemoteException;
+
     boolean startInstrumentation(ComponentName className, String profileFile,
                                   int flags, Bundle arguments, IInstrumentationWatcher watcher,
                                   IUiAutomationConnection connection, int userId,
